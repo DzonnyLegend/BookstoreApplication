@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StartupServices xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <Parameters>
+    <Parameter Name="ClientFront_PartitionCount" Value="1" />
+    <Parameter Name="ClientFront_MinReplicaSetSize" Value="3" />
+    <Parameter Name="ClientFront_TargetReplicaSetSize" Value="3" />
+    <Parameter Name="CommonLibrary_InstanceCount" Value="1" />
+    <Parameter Name="ValidationService_InstanceCount" Value="1" />
+    <Parameter Name="TransactionCoordinator_InstanceCount" Value="1" />
+    <Parameter Name="BookstoreService_PartitionCount" Value="1" />
+    <Parameter Name="BookstoreService_MinReplicaSetSize" Value="3" />
+    <Parameter Name="BookstoreService_TargetReplicaSetSize" Value="3" />
+    <Parameter Name="Bank_PartitionCount" Value="1" />
+    <Parameter Name="Bank_MinReplicaSetSize" Value="3" />
+    <Parameter Name="Bank_TargetReplicaSetSize" Value="3" />
+  </Parameters>
+</StartupServices>

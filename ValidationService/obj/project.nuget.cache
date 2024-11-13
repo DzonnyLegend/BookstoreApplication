@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "dgSpecHash": "RfMp01ZXob8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Administrator\\Desktop\\Cloud_Master_Nikola\\BookstoreApplication\\ValidationService\\ValidationService.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.servicefabric\\10.1.2493\\microsoft.servicefabric.10.1.2493.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.servicefabric.data\\7.1.2493\\microsoft.servicefabric.data.7.1.2493.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.servicefabric.data.extensions\\7.1.2493\\microsoft.servicefabric.data.extensions.7.1.2493.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.servicefabric.data.interfaces\\7.1.2493\\microsoft.servicefabric.data.interfaces.7.1.2493.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.servicefabric.diagnostics.internal\\7.1.2493\\microsoft.servicefabric.diagnostics.internal.7.1.2493.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.servicefabric.services\\7.1.2493\\microsoft.servicefabric.services.7.1.2493.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\8.0.8\\microsoft.aspnetcore.app.runtime.win-x64.8.0.8.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\8.0.8\\microsoft.windowsdesktop.app.runtime.win-x64.8.0.8.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\8.0.8\\microsoft.netcore.app.runtime.win-x64.8.0.8.nupkg.sha512"
+  ],
+  "logs": []
+}
