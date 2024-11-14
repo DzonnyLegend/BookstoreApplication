@@ -15,7 +15,7 @@ namespace CommonLibrary.Interface
         Task<Dictionary<long, Book>?> GetAvailableBooks();
 
         [OperationContract]
-        Task<bool> EnlistPurchase(long bookID, uint count);
+        Task<bool> EnlistPurchase(long bookID, uint count, long customerId);
 
         [OperationContract]
         Task<double?> GetItemPrice(long bookID);

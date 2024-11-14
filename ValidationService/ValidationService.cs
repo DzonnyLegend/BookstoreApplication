@@ -6,17 +6,66 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using CommonLibrary.Interface;
+using CommonLibrary.Model;
+using Microsoft.ServiceFabric.Services.Client;
+using Microsoft.ServiceFabric.Services.Remoting.Client;
+using CommonLibrary;
+
 
 namespace ValidationService
 {
     /// <summary>
     /// An instance of this class is created for each service instance by the Service Fabric runtime.
     /// </summary>
-    internal sealed class ValidationService : StatelessService
+    internal sealed class ValidationService : StatelessService, IValidationService
     {
+        private BookDatabase bookDatabase = new BookDatabase();
+        private CustomerDatabase customerDatabase = new CustomerDatabase();
+
         public ValidationService(StatelessServiceContext context)
             : base(context)
         { }
+
+        public async Task<List<string>> GetAllBooks()
+        {
+            return await Task.FromResult(bookDatabase.Books.Values.Select(book => $"{book.Title} by {book.Author}").ToList());
+        }
+
+        public async Task<List<string>> GetAllClients()
+        {
+            return await Task.FromResult(customerDatabase.Customers.Values.Select(customer => customer.FullName).ToList());
+        }
+
+        public async Task<string?> GetBook(long bookID)
+        {
+            if (bookDatabase.Books.TryGetValue(bookID, out Book? book))
+            {
+                return await Task.FromResult(book != null ? $"{book.Title} by {book.Author}" : "Book not found");
+
+            }
+            return null;
+        }
+
+        public async Task<string> GetValidClient(long customerId)
+        {
+            if (customerDatabase.Customers.TryGetValue(customerId, out Customer? customer) && customer != null)
+            {
+                if (customer.AccountBalance > 0)
+                {
+                    return await Task.FromResult(customer.FullName!);
+                }
+            }
+
+            return await Task.FromResult(string.Empty);
+        }
+
+
+        public async Task<bool> Validation(Book book)
+        {
+            bool isBookValid = book != null && !string.IsNullOrEmpty(book.Title) && book.Price > 0 && book.Quantity > 0;
+            return await Task.FromResult(isBookValid);
+        }
 
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.

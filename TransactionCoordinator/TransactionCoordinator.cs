@@ -4,6 +4,7 @@ using System.Fabric;
 using System.Threading;
 using System.Threading.Tasks;
 using CommonLibrary.Interface;
+using CommonLibrary.Model;
 using Microsoft.ServiceFabric.Services.Client;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
@@ -21,53 +22,64 @@ namespace TransactionCoordinator
 
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return this.CreateServiceRemotingInstanceListeners(); // Koristi CreateServiceRemotingInstanceListeners za StatelessService
+            return this.CreateServiceRemotingInstanceListeners(); 
         }
-
-        // Implementacija metoda definisanih u ITransactionCoordinator
 
         public async Task<List<string>> GetAllBooks()
         {
-            // Primer: poziv odgovarajućeg servisa da dobije sve knjige
             IBookstoreService proxy = ServiceProxy.Create<IBookstoreService>(new Uri("fabric:/BookstoreTransaction/BookstoreService"), new ServicePartitionKey(1));
             return await proxy.GetAllBooks();
         }
 
         public async Task<List<string>> GetAllClients()
         {
-            // Primer: poziv odgovarajućeg servisa da dobije sve klijente
             IBank proxy = ServiceProxy.Create<IBank>(new Uri("fabric:/BookstoreTransaction/Bank"), new ServicePartitionKey(1));
             return await proxy.ListClients();
         }
 
         public async Task<string?> GetBook(long bookID)
         {
-            // Primer: poziv odgovarajućeg servisa da dobije podatke o knjizi po ID-u
             IBookstoreService proxy = ServiceProxy.Create<IBookstoreService>(new Uri("fabric:/BookstoreTransaction/BookstoreService"), new ServicePartitionKey(1));
             return await proxy.GetBook(bookID);
         }
 
         public async Task<string> GetValidClient(string client)
         {
-            // Primer: poziv odgovarajućeg servisa da proveri validnost klijenta
             IBank proxy = ServiceProxy.Create<IBank>(new Uri("fabric:/BookstoreTransaction/Bank"), new ServicePartitionKey(1));
             return await proxy.GetValidClient(client);
         }
 
-        public async Task<bool> Prepare(long bookID, long userID, uint count)
+        public async Task<bool> CompleteTransaction(long bookID, uint count, long customerId)
         {
-            // Kreiramo proxy objekte za Bank i Bookstore servise
+            if (await Prepare(bookID, customerId, count, customerId))
+            {
+                if (await Commit())
+                {
+                    return true;
+                }
+                else
+                {
+                    await Rollback();
+                }
+            }
+            else
+            {
+                await Rollback();
+            }
+
+            return false;
+        }
+
+        public async Task<bool> Prepare(long bookID, long userID, uint count, long customerId)
+        {
             IBank bankProxy = ServiceProxy.Create<IBank>(new Uri("fabric:/BookstoreTransaction/Bank"), new ServicePartitionKey(1));
             IBookstoreService bookProxy = ServiceProxy.Create<IBookstoreService>(new Uri("fabric:/BookstoreTransaction/BookstoreService"), new ServicePartitionKey(1));
 
-            // Dobijamo cenu knjige
             var bookPrice = await bookProxy.GetItemPrice(bookID);
 
-            // Rezervacija novca i knjige
             await bankProxy.EnlistMoneyTransfer(userID, (double)bookPrice * count);
-            await bookProxy.EnlistPurchase(bookID, count);
+            await bookProxy.EnlistPurchase(bookID, count, customerId);
 
-            // Proveravamo da li su oba servisa uspešno pripremila transakciju
             if (await bankProxy.Prepare() && await bookProxy.Prepare())
             {
                 return true;
@@ -78,13 +90,20 @@ namespace TransactionCoordinator
 
         public async Task<bool> Commit()
         {
-            // Potvrđujemo (commit-ujemo) i za Bookstore i za Bank
-            IBank bankProxy = ServiceProxy.Create<IBank>(new Uri("fabric:/BookstoreTransaction/Bank"), new ServicePartitionKey(1));
-            IBookstoreService bookProxy = ServiceProxy.Create<IBookstoreService>(new Uri("fabric:/BookstoreTransaction/BookstoreService"), new ServicePartitionKey(1));
-
-            if (await bankProxy.Commit() && await bookProxy.Commit())
+            try
             {
-                return true;
+                var bookService = ServiceProxy.Create<IBookstoreService>(new Uri("fabric:/BookstoreTransaction/BookstoreService"), new ServicePartitionKey(1));
+                var bankService = ServiceProxy.Create<IBank>(new Uri("fabric:/BookstoreTransaction/Bank"), new ServicePartitionKey(1));
+
+                if (await bankService.Commit() && await bookService.Commit())
+                {
+                    ServiceEventSource.Current.ServiceMessage(this.Context, "Transakcija uspešno potvrđena.");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"Greška pri potvrđivanju transakcije: {ex.Message}");
             }
 
             return false;
@@ -92,20 +111,28 @@ namespace TransactionCoordinator
 
         public async Task<bool> Rollback()
         {
-            // Vraćamo transakciju (rollback) i za Bookstore i za Bank
-            IBank bankProxy = ServiceProxy.Create<IBank>(new Uri("fabric:/BookstoreTransaction/Bank"), new ServicePartitionKey(1));
-            IBookstoreService bookProxy = ServiceProxy.Create<IBookstoreService>(new Uri("fabric:/BookstoreTransaction/BookstoreService"), new ServicePartitionKey(1));
+            try
+            {
+                var bookService = ServiceProxy.Create<IBookstoreService>(new Uri("fabric:/BookstoreTransaction/BookstoreService"), new ServicePartitionKey(1));
+                var bankService = ServiceProxy.Create<IBank>(new Uri("fabric:/BookstoreTransaction/Bank"), new ServicePartitionKey(1));
 
-            await bankProxy.Rollback();
-            await bookProxy.Rollback();
+                if (await bankService.Rollback() && await bookService.Rollback())
+                {
+                    ServiceEventSource.Current.ServiceMessage(this.Context, "Transakcija uspešno poništena.");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ServiceEventSource.Current.ServiceMessage(this.Context, $"Greška pri poništavanju transakcije: {ex.Message}");
+            }
 
-            return true;
+            return false;
         }
 
 
         protected override async Task RunAsync(CancellationToken cancellationToken)
         {
-            // Primer: osnovni kod za stalni zadatak
             long iterations = 0;
 
             while (true)

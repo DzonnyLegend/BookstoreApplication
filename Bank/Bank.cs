@@ -56,7 +56,6 @@ namespace Bank
                 var result = await usersDictionary.TryGetValueAsync(tx, userID);
                 if (result.HasValue && result.Value.AccountBalance >= amount)
                 {
-                    // Rezervišemo sredstva privremeno
                     var updatedCustomer = result.Value;
                     updatedCustomer.AccountBalance -= amount;
 

@@ -14,10 +14,10 @@ namespace CommonLibrary.Model
         public long UserId { get; set; }
 
         [DataMember]
-        public string FullName { get; set; }  // Kombinacija imena i prezimena
+        public string FullName { get; set; }
 
         [DataMember]
-        public double AccountBalance { get; set; }  // Balans na računu korisnika
+        public double AccountBalance { get; set; }  
 
         public Customer(long userId, string fullName, double accountBalance)
         {

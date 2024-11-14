@@ -4,6 +4,7 @@ using System.Fabric;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CommonLibrary;
 using CommonLibrary.Interface;
 using CommonLibrary.Model;
 using Microsoft.ServiceFabric.Data.Collections;
@@ -19,6 +20,9 @@ namespace BookstoreService
     /// </summary>
     internal sealed class BookstoreService : StatefulService, IBookstoreService
     {
+        private BookDatabase bookDatabase = new BookDatabase();
+        private CustomerDatabase customerDatabase = new CustomerDatabase();
+
         public BookstoreService(StatefulServiceContext context)
             : base(context)
         { }
@@ -69,22 +73,9 @@ namespace BookstoreService
             }
         }
 
-        private Dictionary<long, Book> books = new Dictionary<long, Book>
-        {
-            { 1, new Book(1, "The Great Gatsby", "A novel set in the Roaring Twenties", "F. Scott Fitzgerald", 10.0, 3) },
-            { 2, new Book(2, "1984", "A dystopian novel about totalitarianism", "George Orwell", 15.0, 5) },
-            { 3, new Book(3, "To Kill a Mockingbird", "A story about racial inequality", "Harper Lee", 12.5, 4) },
-            { 4, new Book(4, "Pride and Prejudice", "A romantic novel", "Jane Austen", 8.0, 6) },
-            { 5, new Book(5, "Moby Dick", "A story about the quest for a giant whale", "Herman Melville", 18.0, 2) }
-        };
-
-
-
-
-
         public async Task<double?> GetItemPrice(long bookID)
         {
-            if (books.TryGetValue(bookID, out Book? book))
+            if (bookDatabase.Books.TryGetValue(bookID, out Book? book))
             {
                 return await Task.FromResult(book.Price);
             }
@@ -93,7 +84,7 @@ namespace BookstoreService
 
         public async Task<string?> GetBook(long bookID)
         {
-            if (books.TryGetValue(bookID, out Book? book))
+            if (bookDatabase.Books.TryGetValue(bookID, out Book? book))
             {
                 return await Task.FromResult($"{book.Title} by {book.Author}");
             }
@@ -102,26 +93,56 @@ namespace BookstoreService
 
         public async Task<List<string>> GetAllBooks()
         {
-            return await Task.FromResult(books.Values.Select(book => $"{book.Title} by {book.Author}").ToList());
+            return await Task.FromResult(bookDatabase.Books.Values.Select(book => $"{book.Title} by {book.Author}").ToList());
         }
 
-        public async Task<bool> EnlistPurchase(long bookID, uint count)
+        public async Task<bool> EnlistPurchase(long bookID, uint count, long customerId)
         {
-            if (books.TryGetValue(bookID, out Book? book) && book.Quantity >= count)
+            if (bookDatabase.Books.TryGetValue(bookID, out Book? book) && book.Quantity >= count)
             {
-                book.Quantity -= (uint)count;
-                ServiceEventSource.Current.ServiceMessage(this.Context, $"Rezervacija za kupovinu knjige {bookID} u količini {count}.");
-                return await Task.FromResult(true);
+                double totalPrice = (double)(book.Price ?? 0.0) * count;
+
+                if (customerDatabase.Customers.TryGetValue(customerId, out Customer? customer) && customer.AccountBalance >= totalPrice)
+                {
+                    customer.AccountBalance -= totalPrice;
+                    book.Quantity -= (uint)count;
+
+                    ServiceEventSource.Current.ServiceMessage(this.Context, $"Korisnik {customerId} je kupio knjigu {bookID} u količini {count} za ukupno {totalPrice}.");
+
+                    return await Task.FromResult(true);
+                }
             }
+
             return await Task.FromResult(false);
         }
 
+
         public async Task<Dictionary<long, Book>?> GetAvailableBooks()
         {
-            return await Task.FromResult<Dictionary<long, Book>?>(books);
+            return await Task.FromResult<Dictionary<long, Book>?>(bookDatabase.Books);
         }
 
-        // Implementacija metoda definisanih u ITransactionService 
+        public async Task<double?> GetCustomerBalance(long customerId)
+        {
+            if (customerDatabase.Customers.TryGetValue(customerId, out Customer? customer))
+            {
+                return await Task.FromResult(customer.AccountBalance);
+            }
+            return null;
+        }
+
+        public async Task<bool> UpdateCustomerBalance(long customerId, double amount)
+        {
+            if (customerDatabase.Customers.TryGetValue(customerId, out Customer? customer))
+            {
+                if (customer.AccountBalance + amount >= 0)
+                {
+                    customer.AccountBalance += amount;
+                    return await Task.FromResult(true);
+                }
+            }
+            return await Task.FromResult(false);
+        }
 
         public async Task<bool> Prepare()
         {

@@ -10,7 +10,7 @@ using Microsoft.ServiceFabric.Services.Remoting;
 namespace CommonLibrary.Interface
 {
     [ServiceContract]
-    public interface IValidation : IService
+    public interface IValidationService : IService
     {
         [OperationContract]
         Task<bool> Validation(Book book);
@@ -25,7 +25,7 @@ namespace CommonLibrary.Interface
         Task<List<string>> GetAllClients();
 
         [OperationContract]
-        Task<string> GetValidClient(Customer customer);
+        Task<string> GetValidClient(long customerId);
 
     }
 }
