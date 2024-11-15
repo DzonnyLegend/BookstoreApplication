@@ -18,6 +18,26 @@ build_property.GenerateRazorMetadataSourceChecksumAttributes =
 build_property.MSBuildProjectDirectory = C:\Users\Administrator\Desktop\Cloud_Master_Nikola\BookstoreApplication\ClientFront
 build_property._RazorSourceGeneratorDebug = 
 
+[C:/Users/Administrator/Desktop/Cloud_Master_Nikola/BookstoreApplication/ClientFront/Views/Bank/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFua1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Administrator/Desktop/Cloud_Master_Nikola/BookstoreApplication/ClientFront/Views/Bank/List.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmFua1xMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Administrator/Desktop/Cloud_Master_Nikola/BookstoreApplication/ClientFront/Views/Books/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Administrator/Desktop/Cloud_Master_Nikola/BookstoreApplication/ClientFront/Views/Books/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Administrator/Desktop/Cloud_Master_Nikola/BookstoreApplication/ClientFront/Views/Books/Payment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9va3NcUGF5bWVudC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Administrator/Desktop/Cloud_Master_Nikola/BookstoreApplication/ClientFront/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

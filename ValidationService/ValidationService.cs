@@ -60,7 +60,6 @@ namespace ValidationService
             return await Task.FromResult(string.Empty);
         }
 
-
         public async Task<bool> Validation(Book book)
         {
             bool isBookValid = book != null && !string.IsNullOrEmpty(book.Title) && book.Price > 0 && book.Quantity > 0;

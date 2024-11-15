@@ -25,5 +25,6 @@ namespace CommonLibrary.Model
             FullName = fullName;
             AccountBalance = accountBalance;
         }
+        public Customer() { }
     }
 }

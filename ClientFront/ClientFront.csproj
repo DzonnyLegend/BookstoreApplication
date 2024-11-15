@@ -14,4 +14,8 @@
     <PackageReference Include="Microsoft.ServiceFabric.AspNetCore.Kestrel" Version="7.1.2493" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CommonLibrary\CommonLibrary.csproj" />
+  </ItemGroup>
+
 </Project>

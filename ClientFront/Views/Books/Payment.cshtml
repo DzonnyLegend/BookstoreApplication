@@ -1,0 +1,13 @@
+﻿<h2>Plaćanje</h2>
+
+<form method="post" asp-action="Payment">
+    <div>
+        <label for="cardNumber">Broj Kartice:</label>
+        <input type="text" id="cardNumber" name="cardNumber" />
+    </div>
+    <div>
+        <label for="expiryDate">Datum Isteka:</label>
+        <input type="text" id="expiryDate" name="expiryDate" />
+    </div>
+    <button type="submit">Plati</button>
+</form>
